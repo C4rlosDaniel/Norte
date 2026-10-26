@@ -69,14 +69,76 @@ Vários períodos por dia são permitidos (almoço e jantar). A unicidade é
 Contador por `(bucket, window_start)` para rate limit distribuído. Ainda sem uso
 — entra no checkout (Fase 3) e nas rotas sensíveis (Fase 6).
 
-## Fase 2 (planejado)
+## Fase 2 (implementado)
 
-- `menu_categories` (nome, ordem, ativo)
-- `products` (categoria, nome, descrição, preço em centavos, disponível,
-  destaque, ordem, imagem)
-- `modifier_groups` (produto, nome, mínimo, máximo, obrigatório)
-- `modifiers` / `product_modifiers` (nome, preço adicional em centavos,
-  disponível)
+### `menu_categories`
+
+| Coluna | Tipo | Observação |
+| --- | --- | --- |
+| `id` | uuid pk | |
+| `restaurant_id` | uuid fk cascade | |
+| `name` | text | único por restaurante no banco (maiúsculas contam) |
+| `description` | text | padrão vazio |
+| `sort_order` | integer | `CHECK >= 0`; menor aparece primeiro |
+| `is_active` | boolean | categoria inativa não aparece no site |
+| `created_at`, `updated_at` | timestamptz | |
+
+O app recusa nome repetido sem diferenciar maiúsculas (`Porções` × `porções`),
+além do índice único do banco. Categoria com produtos não pode ser excluída
+pelo app.
+
+### `products`
+
+| Coluna | Tipo | Observação |
+| --- | --- | --- |
+| `id` | uuid pk | |
+| `restaurant_id` | uuid fk cascade | redundante com a categoria, mas usado na autorização |
+| `category_id` | uuid fk cascade | |
+| `name` | text | |
+| `description` | text | padrão vazio |
+| `price_cents` | integer | `CHECK >= 0`, nunca float |
+| `image_url` | text nullable | reservado; upload ainda não existe |
+| `serves_label` | text | "Serve 1", "Serve 2" |
+| `badge` | text | selo curto ("Raiz", "Mais pedido") |
+| `tags` | text[] | filtros futuros (`serve1`, `dividir`, ...) |
+| `is_available` | boolean | pausa sem apagar o produto |
+| `is_featured` | boolean | alimenta "Os mais pedidos" |
+| `sort_order` | integer | `CHECK >= 0` |
+| `created_at`, `updated_at` | timestamptz | |
+
+Índice em `(restaurant_id, category_id, sort_order)`. Apagar produto remove
+grupos e opções em cascata; pedidos antigos não são afetados porque guardam
+snapshot (Fase 3).
+
+### `modifier_groups`
+
+Pertencem ao produto, não são compartilhados.
+
+| Coluna | Tipo | Observação |
+| --- | --- | --- |
+| `id` | uuid pk | |
+| `product_id` | uuid fk cascade | |
+| `name` | text | ex.: "Ponto da carne", "Adicionais" |
+| `min_selections` | integer | `>= 0`; maior que zero = obrigatório |
+| `max_selections` | integer | `>= 1` e `>= min_selections` |
+| `sort_order` | integer | |
+| `created_at`, `updated_at` | timestamptz | |
+
+### `modifier_options`
+
+| Coluna | Tipo | Observação |
+| --- | --- | --- |
+| `id` | uuid pk | |
+| `group_id` | uuid fk cascade | |
+| `name` | text | |
+| `price_cents` | integer | `CHECK >= 0`; zero = sem custo |
+| `is_available` | boolean | opção indisponível não aparece no site |
+| `sort_order` | integer | |
+| `created_at`, `updated_at` | timestamptz | |
+
+Consultas do cardápio público fazem três leituras por página (categorias,
+produtos, adicionais) e montam a árvore em memória. Categoria inativa ou vazia
+não é renderizada; produto indisponível é renderizado marcado.
 
 ## Fase 3 (planejado)
 

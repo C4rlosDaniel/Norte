@@ -104,6 +104,114 @@ export const businessHours = pgTable(
   ],
 );
 
+export const menuCategories = pgTable(
+  "menu_categories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    restaurantId: uuid("restaurant_id")
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description").notNull().default(""),
+    sortOrder: integer("sort_order").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("menu_categories_restaurant_name_key").on(table.restaurantId, table.name),
+    index("menu_categories_restaurant_sort_idx").on(table.restaurantId, table.sortOrder),
+    check("menu_categories_sort_order_non_negative", sql`${table.sortOrder} >= 0`),
+  ],
+);
+
+export const products = pgTable(
+  "products",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    restaurantId: uuid("restaurant_id")
+      .notNull()
+      .references(() => restaurants.id, { onDelete: "cascade" }),
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => menuCategories.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description").notNull().default(""),
+    priceCents: integer("price_cents").notNull(),
+    imageUrl: text("image_url"),
+    servesLabel: text("serves_label").notNull().default(""),
+    /** Selo curto exibido no cardápio ("Raiz", "Mais pedido", ...). */
+    badge: text("badge").notNull().default(""),
+    /** Filtros do cardápio: serve1, dividir, carnesol, peixes. */
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    isAvailable: boolean("is_available").notNull().default(true),
+    isFeatured: boolean("is_featured").notNull().default(false),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("products_restaurant_category_sort_idx").on(
+      table.restaurantId,
+      table.categoryId,
+      table.sortOrder,
+    ),
+    check("products_price_cents_non_negative", sql`${table.priceCents} >= 0`),
+    check("products_sort_order_non_negative", sql`${table.sortOrder} >= 0`),
+  ],
+);
+
+/**
+ * Grupos de adicionais pertencem ao produto (não são compartilhados entre
+ * produtos). `min_selections > 0` significa escolha obrigatória.
+ */
+export const modifierGroups = pgTable(
+  "modifier_groups",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    minSelections: integer("min_selections").notNull().default(0),
+    maxSelections: integer("max_selections").notNull().default(1),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("modifier_groups_product_sort_idx").on(table.productId, table.sortOrder),
+    check("modifier_groups_min_non_negative", sql`${table.minSelections} >= 0`),
+    check("modifier_groups_max_positive", sql`${table.maxSelections} >= 1`),
+    check("modifier_groups_max_gte_min", sql`${table.maxSelections} >= ${table.minSelections}`),
+    check("modifier_groups_sort_order_non_negative", sql`${table.sortOrder} >= 0`),
+  ],
+);
+
+export const modifierOptions = pgTable(
+  "modifier_options",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => modifierGroups.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    priceCents: integer("price_cents").notNull().default(0),
+    isAvailable: boolean("is_available").notNull().default(true),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("modifier_options_group_sort_idx").on(table.groupId, table.sortOrder),
+    check("modifier_options_price_cents_non_negative", sql`${table.priceCents} >= 0`),
+    check("modifier_options_sort_order_non_negative", sql`${table.sortOrder} >= 0`),
+  ],
+);
+
 /**
  * Contador de requisições por janela. Fica no banco porque serverless
  * não tem memória compartilhada e não queremos um serviço extra nesta fase.
@@ -122,3 +230,7 @@ export type Restaurant = typeof restaurants.$inferSelect;
 export type RestaurantUser = typeof restaurantUsers.$inferSelect;
 export type RestaurantSettings = typeof restaurantSettings.$inferSelect;
 export type BusinessHour = typeof businessHours.$inferSelect;
+export type MenuCategory = typeof menuCategories.$inferSelect;
+export type Product = typeof products.$inferSelect;
+export type ModifierGroup = typeof modifierGroups.$inferSelect;
+export type ModifierOption = typeof modifierOptions.$inferSelect;

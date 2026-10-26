@@ -1,8 +1,7 @@
-import { StatusBadge, closedReasonLabel } from "@/components/status-badge";
+import { PublicMenuView } from "@/components/public-menu-view";
 import { getDb } from "@/server/db/client";
 import { getEnv } from "@/server/env";
-import { formatBRL } from "@/server/money";
-import { evaluateOpenState } from "@/server/restaurant/business-hours";
+import { getPublicMenu } from "@/server/menu/queries";
 import { getRestaurantBySlug, getRestaurantSnapshot } from "@/server/restaurant/queries";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +31,11 @@ export default async function HomePage() {
     );
   }
 
-  const snapshot = await getRestaurantSnapshot(db, restaurant.id);
+  const [snapshot, menu] = await Promise.all([
+    getRestaurantSnapshot(db, restaurant.id),
+    getPublicMenu(db, restaurant.id),
+  ]);
+
   if (!snapshot) {
     return (
       <main className="mx-auto max-w-xl px-6 py-16">
@@ -44,57 +47,12 @@ export default async function HomePage() {
     );
   }
 
-  const state = evaluateOpenState({
-    hours: snapshot.hours,
-    now: new Date(),
-    timeZone: snapshot.restaurant.timezone,
-    manuallyClosed: snapshot.settings.isManuallyClosed,
-    deliveryEnabled: snapshot.settings.deliveryEnabled,
-  });
-
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-6 py-16">
-      <header className="space-y-3">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-terracotta">Cardápio</p>
-        <h1 className="font-display text-4xl leading-tight">{snapshot.restaurant.name}</h1>
-        <div className="flex flex-wrap items-center gap-3">
-          <StatusBadge state={state} />
-          <span className="text-sm text-ink-soft">{closedReasonLabel(state)}</span>
-        </div>
-      </header>
-
-      <section className="card space-y-3 p-6">
-        <h2 className="font-display text-xl">Em construção</h2>
-        <p className="text-sm text-ink-soft">
-          A fundação já está de pé: banco, autenticação do painel, horários e configurações. O
-          cardápio público entra na Fase 2 e o pedido na Fase 3.
-        </p>
-        <dl className="grid gap-2 border-t border-leather/10 pt-3 text-sm">
-          <div className="flex justify-between gap-4">
-            <dt className="text-ink-soft">Taxa de entrega</dt>
-            <dd className="font-semibold">
-              {snapshot.settings.deliveryEnabled
-                ? formatBRL(snapshot.settings.deliveryFeeCents)
-                : "Entrega desativada"}
-            </dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-ink-soft">Endereço</dt>
-            <dd className="text-right font-semibold">{snapshot.settings.addressLine || "—"}</dd>
-          </div>
-          <div className="flex justify-between gap-4">
-            <dt className="text-ink-soft">Telefone</dt>
-            <dd className="font-semibold">{snapshot.settings.phone || "—"}</dd>
-          </div>
-        </dl>
-      </section>
-
-      <footer className="text-xs text-ink-soft">
-        Acesso da equipe:{" "}
-        <a className="font-semibold underline" href="/painel">
-          painel do restaurante
-        </a>
-      </footer>
-    </main>
+    <PublicMenuView
+      restaurant={snapshot.restaurant}
+      settings={snapshot.settings}
+      hours={snapshot.hours}
+      menu={menu}
+    />
   );
 }

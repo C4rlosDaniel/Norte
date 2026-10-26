@@ -71,3 +71,17 @@ entrada e limites de quantidade/observação.
 
 Adiada. A aplicação é agnóstica: precisa de Node com suporte a streaming e de
 um Postgres gerenciado (Supabase).
+
+## D13 — Modelo do cardápio
+
+Categoria → produto → grupo de adicionais → opção. Grupos e opções pertencem ao
+produto (não são compartilhados entre produtos). "Mais pedidos" é
+`products.is_featured`, não uma categoria com produtos duplicados. Produto
+indisponível continua visível e marcado no site; a disponibilidade é validada
+de novo no checkout.
+
+## D14 — Imagens de produto
+
+A coluna `products.image_url` existe, mas upload e exibição ficam adiados até
+haver fotos reais e uma decisão de storage. Não implementar uma tela de upload
+sem conteúdo nem renderizar imagem quebrada.

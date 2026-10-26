@@ -5,6 +5,7 @@ config({ path: [".env.local", ".env"], quiet: true });
 import { createDb } from "@/server/db/client";
 import { businessHours, restaurantSettings, restaurants } from "@/server/db/schema";
 import { getRestaurantBySlug } from "@/server/restaurant/queries";
+import { seedMenu } from "./seed-menu";
 
 /**
  * Seed de DESENVOLVIMENTO. Idempotente e não destrutivo:
@@ -75,6 +76,8 @@ async function main() {
   });
 
   await db.insert(businessHours).values(hours).onConflictDoNothing();
+
+  await seedMenu(db, restaurant.id, { reset: process.env["SEED_RESET_MENU"] === "1" });
 
   console.log("[seed] configurações e horários garantidos (dados de DEMONSTRAÇÃO).");
   console.log("[seed] concluído.");

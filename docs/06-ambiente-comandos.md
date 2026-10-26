@@ -55,14 +55,17 @@ npm run lint         # ESLint (sem regras desligadas)
 npm run typecheck    # tsc --noEmit
 npm test             # Vitest (unitários + integração PGlite)
 npm run test:watch   # Vitest em watch
-npm run test:e2e     # Playwright (login e configurações, exige Supabase real)
+npm run test:e2e     # Playwright (login, configurações e cardápio; exige Supabase real)
 
 npm run db:generate  # gerar migração a partir do schema
 npm run db:migrate   # aplicar migrações (usa DIRECT_URL)
 npm run db:studio    # Drizzle Studio
-npm run db:seed      # dados de demonstração (idempotente)
+npm run db:seed      # dados de demonstração (idempotente, não sobrescreve cardápio)
 npm run create:admin # cria/atualiza acesso do painel (service role)
 ```
+
+Para reimportar o cardápio de demonstração do zero (destrutivo, só em
+desenvolvimento): `SEED_RESET_MENU=1 npm run db:seed`.
 
 ## Migrações
 
@@ -87,12 +90,15 @@ por processo.
 `npm test` roda sem banco externo:
 
 - **Unitários**: horário de funcionamento (fuso, múltiplos períodos, virada de
-  meia-noite, entrega), dinheiro, schema de configurações.
+  meia-noite, entrega), dinheiro, schemas de configurações e cardápio,
+  integridade dos dados importados do protótipo.
 - **Integração**: Postgres real em WASM (PGlite) com as mesmas migrações;
-  valida SQL, constraints, autorização e gravação de configurações.
+  valida SQL, constraints, autorização de configurações, CRUD do cardápio,
+  isolamento entre restaurantes e filtros do cardápio público.
 
 Os testes de unidade/integração **não** cobrem login real no Supabase, RLS nem o
-navegador. O login e a gravação de configurações são cobertos pelo E2E abaixo.
+navegador. Login, configurações e o fluxo do cardápio são cobertos pelo E2E
+abaixo.
 
 ## E2E (Playwright)
 
@@ -107,8 +113,11 @@ E2E_EMAIL="voce@restaurante.com" E2E_PASSWORD="sua-senha" npm run test:e2e
   já aberto.
 - Sem `E2E_EMAIL`/`E2E_PASSWORD` os testes autenticados são pulados (o CI não
   tem segredo).
-- O teste altera a taxa de entrega, recarrega para provar a persistência e
-  restaura o valor original.
+- O teste da Fase 1 altera a taxa de entrega, recarrega para provar a
+  persistência e restaura o valor original.
+- O teste da Fase 2 cria categoria, produto e adicional, confere no cardápio
+  público, tenta excluir a categoria com produto (bloqueado), remove tudo e
+  limpa os dados mesmo se falhar.
 - Instalação do navegador: `npx playwright install chromium`.
 
 ## Latência e região

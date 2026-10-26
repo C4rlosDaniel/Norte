@@ -8,7 +8,7 @@ verificação pendente.
 Concluída. Levantamento do protótipo (Lovable), definição de stack, modelo de
 dados, fluxo de pedido, estratégia de WhatsApp, agente de impressão, riscos.
 
-## Fase 1 — Fundação (atual)
+## Fase 1 — Fundação (concluída)
 
 Entregas:
 
@@ -27,13 +27,17 @@ Fora de escopo: cardápio, pedidos, impressão, WhatsApp, pagamento online.
 Critério de aceite: `lint`, `typecheck`, `test` e `build` verdes; login e
 gravação de configurações verificados contra o Supabase real.
 
-## Fase 2 — Cardápio
+## Fase 2 — Cardápio (concluída)
 
 Categorias, produtos, grupos de adicionais, disponibilidade, destaque,
 ordenação; painel de edição; cardápio público por slug; dados reais migrados do
-protótipo; imagens com storage quando necessário.
+protótipo. Imagens com storage ficaram para depois (não há fotos reais ainda).
 
-## Fase 3 — Pedido
+Critério de aceite cumprido: `lint`, `typecheck`, `test` e `build` verdes;
+migração e seed aplicados no Supabase real; E2E cobrindo categoria, produto,
+adicional, site público e exclusão com limpeza.
+
+## Fase 3 — Pedido (próxima)
 
 Carrinho, checkout (entrega/retirada, pagamento, troco), recálculo integral no
 servidor, snapshot do pedido, número sequencial legível, criação transacional

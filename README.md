@@ -13,8 +13,8 @@ Este repositório é a reescrita séria do protótipo que ficou no projeto
 | --- | --- | --- |
 | 0 | Auditoria e arquitetura | concluída |
 | 1 | Fundação: Next.js, banco, migrações, autenticação, painel, horários e configurações | concluída e verificada no Supabase real |
-| 2 | Cardápio (público e painel) | próxima |
-| 3 | Carrinho, checkout, pedidos e impressão | não iniciada |
+| 2 | Cardápio: categorias, produtos, adicionais, painel e cardápio público | concluída e verificada no Supabase real |
+| 3 | Carrinho, checkout, pedidos e impressão | próxima |
 | 4 | Agente de impressão Windows | não iniciada |
 | 5 | WhatsApp Cloud API | não iniciada |
 | 6 | Endurecimento, LGPD e operação | não iniciada |
@@ -43,7 +43,7 @@ npm run create:admin           # requer SUPABASE_SERVICE_ROLE_KEY, ADMIN_EMAIL e
 npm run dev
 ```
 
-- Cardápio público: http://localhost:3000
+- Cardápio público: http://localhost:3000 (ou `/cardapio/amigos-do-norte`)
 - Painel: http://localhost:3000/painel (sem cadastro público; o acesso é criado pelo script)
 - Verificações: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
 - E2E (com Supabase real): `E2E_EMAIL=... E2E_PASSWORD=... npm run test:e2e`
@@ -60,7 +60,8 @@ Detalhes de ambiente, comandos e configuração do Supabase em
 - [`docs/04-whatsapp-meta.md`](docs/04-whatsapp-meta.md) — Cloud API, janela de 24h, templates, riscos
 - [`docs/05-impressao-agente.md`](docs/05-impressao-agente.md) — agente local, lease, ESC/POS
 - [`docs/06-ambiente-comandos.md`](docs/06-ambiente-comandos.md) — variáveis, comandos, migrações
-- [`docs/fases/fase-1.md`](docs/fases/fase-1.md) — relatório da fase atual
+- [`docs/fases/fase-1.md`](docs/fases/fase-1.md) — relatório da fundação
+- [`docs/fases/fase-2.md`](docs/fases/fase-2.md) — relatório do cardápio
 
 ## Regras do projeto
 
