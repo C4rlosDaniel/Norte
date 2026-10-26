@@ -1,4 +1,8 @@
+import { config as loadEnv } from "dotenv";
 import { defineConfig, devices } from "@playwright/test";
+
+// O runner precisa da mesma DATABASE_URL do servidor para preparar/limpar o E2E.
+loadEnv({ path: ".env.local" });
 
 /**
  * E2E só para fluxos críticos, contra um build de produção e um Supabase real.

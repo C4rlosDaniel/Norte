@@ -66,8 +66,10 @@ Vários períodos por dia são permitidos (almoço e jantar). A unicidade é
 
 ### `rate_limits`
 
-Contador por `(bucket, window_start)` para rate limit distribuído. Ainda sem uso
-— entra no checkout (Fase 3) e nas rotas sensíveis (Fase 6).
+Contador por `(bucket, window_start)` para rate limit distribuído, com
+incremento atômico (`INSERT ... ON CONFLICT DO UPDATE`). Usado no checkout por
+IP (10 pedidos/10 min) e por telefone com hash (10 pedidos/hora); as rotas
+sensíveis restantes entram na Fase 6.
 
 ## Fase 2 (implementado)
 
@@ -140,21 +142,75 @@ Consultas do cardápio público fazem três leituras por página (categorias,
 produtos, adicionais) e montam a árvore em memória. Categoria inativa ou vazia
 não é renderizada; produto indisponível é renderizado marcado.
 
-## Fase 3 (planejado)
+## Fase 3 (implementado)
 
-- `orders` (número sequencial, status, tipo entrega/retirada, cliente,
-  endereço, forma de pagamento, troco, subtotal, taxa, total, `link_code`,
-  timestamps)
-- `order_items` (snapshot de nome e preço, quantidade, observação)
-- `order_item_modifiers` (snapshot de adicionais)
-- `order_events` (histórico de status, autor, timestamp)
-- `print_jobs` (pedido, payload renderizado, status, tentativas, lease)
-- `whatsapp_tasks` / `whatsapp_messages` (tarefa, template, status, id externo)
+Enums: `order_status` (`pending`, `confirmed`, `preparing`, `ready`,
+`out_for_delivery`, `delivered`, `canceled`), `order_type` (`delivery`,
+`pickup`), `payment_method` (`cash`, `card`, `pix`), `print_job_status`
+(`pending`, `processing`, `printed`, `failed`, `canceled`),
+`whatsapp_task_kind` (`order_confirmation`) e `whatsapp_task_status`
+(`pending`, `sent`, `failed`, `skipped`).
+
+### `orders`
+
+| Coluna | Tipo | Observação |
+| --- | --- | --- |
+| `id` | uuid pk | |
+| `restaurant_id` | uuid fk cascade | escopo de autorização |
+| `order_number` | integer | único por restaurante; `CHECK > 0` |
+| `link_code` | text unique | 16 caracteres hex; código do link público |
+| `idempotency_key` | uuid | único por restaurante; evita pedido duplicado |
+| `status` | enum | começa em `pending`; nunca é editado fora da máquina de estados |
+| `type` | enum | entrega ou retirada |
+| `customer_name`, `customer_phone` | text | telefone só com dígitos |
+| `address_*` | text | vazios na retirada |
+| `notes` | text | observação do pedido |
+| `subtotal_cents`, `delivery_fee_cents`, `total_cents` | integer | `CHECK >= 0` e total = subtotal + taxa |
+| `payment_method` | enum | |
+| `change_for_cents` | integer nullable | só dinheiro; `CHECK >= total` quando presente |
+| `cancel_reason` | text | preenchido ao cancelar |
+| `created_at`, `updated_at` | timestamptz | |
+| `confirmed_at`, `ready_at`, `dispatched_at`, `delivered_at`, `canceled_at` | timestamptz nullable | marcos do fluxo |
+
+Índices por `(restaurant_id, created_at)`, `(restaurant_id, status, created_at)`
+e únicos por número, chave de idempotência e `link_code`.
+
+### `order_items`
+
+Snapshot do item: `product_id` é referência fraca (`ON DELETE SET NULL`), mas
+`product_name`, `unit_price_cents`, `quantity`, `modifiers_total_cents`,
+`line_total_cents` e `notes` ficam gravados. `CHECK` garante
+`line_total = (unit_price + modifiers_total) * quantity`.
+
+### `order_item_modifiers`
+
+Snapshot de adicional: `group_name`, `option_name`, `price_cents` e
+`sort_order`. Apagar o grupo/opção do cardápio não altera o pedido.
+
+### `order_events`
+
+Histórico append-only: `order_id`, `status`, `note`, `actor_user_id` (null para
+sistema/cliente) e `created_at`.
+
+### `print_jobs`
+
+Fila de impressão: `status`, `payload` jsonb fechado (versão 1, restaurante,
+cliente, endereço, itens, totais e pagamento), `attempts`, `last_error`,
+`leased_by`, `lease_expires_at`, `printed_at`. O agente não consulta o banco;
+imprime o payload. Consumo entra na Fase 4.
+
+### `whatsapp_tasks`
+
+Fila de WhatsApp: `kind`, `status`, `payload` jsonb (telefone, nome, número,
+link, total e tipo), `attempts`, `last_error`, `scheduled_for`, `sent_at`.
+A tarefa nasce junto do pedido e será consumida na Fase 5.
 
 ## Fase 4/5 (planejado)
 
 - `api_keys` (nome, hash, último uso, revogação) para o agente.
 - `whatsapp_accounts` (phone number id, WABA id, status, tokens cifrados).
+- `whatsapp_messages` (mensagem enviada, id externo, template, status) para
+  deduplicação e auditoria do webhook.
 
 ## Regras que não podem quebrar
 

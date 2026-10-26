@@ -26,6 +26,24 @@ describe("settingsInputSchema", () => {
     }
   });
 
+  it("recusa taxa de entrega abaixo de R$ 5,00 quando a entrega está ativa", () => {
+    const result = settingsInputSchema.safeParse({ ...valid, deliveryFee: "4,99" });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const fields = result.error.issues.map((issue) => issue.path.join("."));
+      expect(fields).toContain("deliveryFee");
+    }
+  });
+
+  it("aceita taxa abaixo do mínimo quando a entrega está desativada", () => {
+    const parsed = settingsInputSchema.parse({
+      ...valid,
+      deliveryFee: "0,00",
+      deliveryEnabled: false,
+    });
+    expect(parsed.deliveryFee).toBe(0);
+  });
+
   it("recusa telefone curto", () => {
     expect(settingsInputSchema.safeParse({ ...valid, phone: "123" }).success).toBe(false);
   });

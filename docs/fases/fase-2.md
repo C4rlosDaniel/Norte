@@ -2,13 +2,19 @@
 
 Data: 26/10/2026
 
+> Nota de atualização: após a reestruturação que transformou a categoria
+> "Adicionais" em grupos de adicionais, o cardápio passou a **16 categorias,
+> 108 produtos, 36 grupos e 175 opções**. As contagens abaixo refletem o estado
+> atual; o restante do relatório preserva as decisões da fase.
+
 ## Entregue
 
 - Schema de cardápio: `menu_categories`, `products`, `modifier_groups`,
   `modifier_options` (migração `0001_married_blink.sql`).
-- Dados do protótipo migrados: 17 categorias, 117 produtos, 36 grupos de
-  adicionais e 130 opções. A antiga categoria virtual "Mais pedidos" virou
-  `products.is_featured` (6 destaques).
+- Dados do protótipo migrados: 16 categorias, 108 produtos, 36 grupos de
+  adicionais e 175 opções. A antiga categoria virtual "Mais pedidos" virou
+  `products.is_featured` (6 destaques); a categoria "Adicionais" foi convertida
+  em grupos de adicionais dos produtos.
 - Painel `/painel/cardapio`:
   - criar, editar e remover categorias (nome, descrição, ordem, ativa/inativa);
   - criar, editar, pausar/ativar e remover produtos (categoria, nome, descrição,
@@ -84,7 +90,7 @@ Tudo em `apps/web`, Node 24.19.0, npm 11.17.0, Windows.
 | `npm test` | 8 arquivos, 66 testes, todos passando |
 | `npm run build` | build de produção concluído; rotas `/`, `/cardapio/[slug]`, `/painel/cardapio`, `/painel/cardapio/produtos/novo` e `/painel/cardapio/produtos/[id]` presentes |
 | `npm run db:migrate` (Supabase real) | migração 0001 aplicada |
-| `npm run db:seed` (Supabase real) | 17 categorias, 117 produtos, 36 grupos, 130 opções |
+| `npm run db:seed` (Supabase real) | 16 categorias, 108 produtos, 36 grupos, 175 opções |
 | `npm run test:e2e` | **3/3 passando**: guarda de rota, configurações (Fase 1) e fluxo completo do cardápio (Fase 2) |
 
 Testes de integração rodam em PGlite com as migrações reais e cobrem:
@@ -113,8 +119,8 @@ O teste `e2e/fase-2.spec.ts` executa contra o build de produção:
 7. exclusão do produto e depois da categoria;
 8. limpeza automática em caso de falha (novo contexto, login e remoção).
 
-Depois da execução, o banco voltou ao estado do seed: 17 categorias, 117
-produtos, 36 grupos, 130 opções e zero registros `E2E %`.
+Depois da execução, o banco voltou ao estado do seed: 16 categorias, 108
+produtos, 36 grupos, 175 opções e zero registros `E2E %`.
 
 ## Não verificado
 
@@ -127,8 +133,9 @@ produtos, 36 grupos, 130 opções e zero registros `E2E %`.
 
 ## Pendências e bloqueios
 
-1. Definir se "Adicionais" (bebidas/extras do protótipo) continua como
-   categoria de produtos ou vira grupo de adicionais — afeta o cardápio real.
+1. ~~Definir se "Adicionais" continua como categoria de produtos ou vira grupo
+   de adicionais.~~ Resolvida: a categoria foi convertida em grupos de
+   adicionais (ver Fase 3).
 2. Fotos dos produtos e decisão de storage (Supabase Storage) antes de exibir
    imagem no site.
 3. Valores reais do restaurante (nome, endereço, telefone, taxa, horários,

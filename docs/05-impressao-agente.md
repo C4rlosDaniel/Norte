@@ -1,6 +1,7 @@
 # Agente de impressão (Windows)
 
-Fase 4. Este documento define a arquitetura; o código ainda não existe.
+Fase 4. A fila `print_jobs` já é criada na transação do pedido com o payload
+fechado (Fase 3); o agente e as rotas de poll/resultado ainda não existem.
 
 ## Princípios
 
@@ -26,7 +27,7 @@ Fase 4. Este documento define a arquitetura; o código ainda não existe.
 ```
 
 - Poll a cada 2–3 segundos, com backoff em erro de rede.
-- `POST /api/print/jobs/claim` devolve até N jobs e marca `claimed_by` +
+- `POST /api/print/jobs/claim` devolve até N jobs e marca `leased_by` +
   `lease_expires_at` em uma transação (`FOR UPDATE SKIP LOCKED`).
 - Se o agente morrer, o lease expira e o job volta a ficar disponível.
 - Falha de impressão registra tentativa e motivo; após N tentativas vira

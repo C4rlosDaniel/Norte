@@ -15,6 +15,13 @@
       "when": 1793025226670,
       "tag": "0001_married_blink",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793033704527,
+      "tag": "0002_wet_thaddeus_ross",
+      "breakpoints": true
     }
   ]
 }

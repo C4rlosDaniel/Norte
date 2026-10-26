@@ -14,8 +14,8 @@ Este repositório é a reescrita séria do protótipo que ficou no projeto
 | 0 | Auditoria e arquitetura | concluída |
 | 1 | Fundação: Next.js, banco, migrações, autenticação, painel, horários e configurações | concluída e verificada no Supabase real |
 | 2 | Cardápio: categorias, produtos, adicionais, painel e cardápio público | concluída e verificada no Supabase real |
-| 3 | Carrinho, checkout, pedidos e impressão | próxima |
-| 4 | Agente de impressão Windows | não iniciada |
+| 3 | Carrinho, checkout, pedidos e fila de impressão/WhatsApp | concluída e verificada no Supabase real |
+| 4 | Agente de impressão Windows | próxima |
 | 5 | WhatsApp Cloud API | não iniciada |
 | 6 | Endurecimento, LGPD e operação | não iniciada |
 | 7 | Publicação | não iniciada |
@@ -44,9 +44,11 @@ npm run dev
 ```
 
 - Cardápio público: http://localhost:3000 (ou `/cardapio/amigos-do-norte`)
+- Checkout: `/checkout/amigos-do-norte`; acompanhamento: `/pedido/[codigo]`
 - Painel: http://localhost:3000/painel (sem cadastro público; o acesso é criado pelo script)
 - Verificações: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
 - E2E (com Supabase real): `E2E_EMAIL=... E2E_PASSWORD=... npm run test:e2e`
+  (o runner lê `DATABASE_URL` do `.env.local` para preparar e limpar o pedido)
 
 Detalhes de ambiente, comandos e configuração do Supabase em
 [`docs/06-ambiente-comandos.md`](docs/06-ambiente-comandos.md).
@@ -62,6 +64,7 @@ Detalhes de ambiente, comandos e configuração do Supabase em
 - [`docs/06-ambiente-comandos.md`](docs/06-ambiente-comandos.md) — variáveis, comandos, migrações
 - [`docs/fases/fase-1.md`](docs/fases/fase-1.md) — relatório da fundação
 - [`docs/fases/fase-2.md`](docs/fases/fase-2.md) — relatório do cardápio
+- [`docs/fases/fase-3.md`](docs/fases/fase-3.md) — relatório do pedido
 
 ## Regras do projeto
 

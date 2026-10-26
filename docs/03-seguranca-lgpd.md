@@ -42,6 +42,9 @@ Sem CPF, sem e-mail do cliente, sem geolocalização, sem perfil comportamental.
 - Direitos do titular: canal de contato no cardápio e procedimento para
   exclusão/anonimização.
 - Imagens de cardápio não devem conter pessoas identificáveis.
+- O snapshot do pedido (`orders`, `order_items`) e as filas (`print_jobs`,
+  `whatsapp_tasks`) guardam nome, telefone e endereço. O acesso é só pelo
+  servidor; a retenção e o expurgo precisam cobrir essas tabelas na Fase 6.
 
 Pendências para a Fase 6: política de privacidade, prazo de retenção, rotina de
 expurgo, registro das operações de tratamento.
@@ -56,14 +59,18 @@ expurgo, registro das operações de tratamento.
 | SQL injection | Drizzle parametrizado + Zod | ok |
 | XSS | React escapa por padrão; sem `dangerouslySetInnerHTML` | ok |
 | CSRF em Server Actions | origem verificada pelo Next | ok |
-| Enumeração de dados | mensagens de login genéricas | ok |
+| Enumeração de dados | mensagens de login genéricas; link do pedido usa código aleatório de 64 bits | ok |
+| Pedido duplicado | chave de idempotência única por restaurante + verificação antes e depois da transação | ok |
+| Abuso no checkout | rate limit por IP e por telefone (hash), validado no servidor | ok |
+| Adicional/preço forjado | servidor relê produto, grupo, opção e preço; nunca aceita total do cliente | ok |
 | Logs com PII | sanitização por chave | ok |
 
 ## Checklist antes do go-live
 
 - [ ] CSP com nonce (hoje só `nosniff` e `Referrer-Policy`)
-- [ ] Rate limit no login e no checkout
-- [ ] Turnstile no checkout
+- [ ] Rate limit no login
+- [x] Rate limit no checkout (IP e telefone, em banco)
+- [ ] Turnstile/CAPTCHA no checkout (reavaliar na Fase 6; não implementado na Fase 3)
 - [ ] Backups automáticos + restauração testada
 - [ ] Retenção e expurgo de dados pessoais
 - [ ] Revisão de permissões do projeto Supabase (RLS desligado é aceitável

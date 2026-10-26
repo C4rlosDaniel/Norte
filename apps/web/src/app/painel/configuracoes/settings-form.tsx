@@ -46,7 +46,9 @@ export function SettingsForm({ settings }: { settings: SettingsForPanel }) {
             inputMode="decimal"
             placeholder="5,00"
           />
-          <p className="mt-1 text-xs text-ink-soft">Use vírgula para centavos. Ex.: 5,00</p>
+          <p className="mt-1 text-xs text-ink-soft">
+            Use vírgula para centavos. Mínimo de R$ 5,00 quando a entrega está ativa.
+          </p>
           <FieldError messages={state.fieldErrors?.["deliveryFee"]} />
         </div>
       </div>

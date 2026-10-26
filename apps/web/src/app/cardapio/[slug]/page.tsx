@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PublicMenuView } from "@/components/public-menu-view";
 import { getDb } from "@/server/db/client";
 import { getPublicMenu } from "@/server/menu/queries";
+import { evaluateOpenState } from "@/server/restaurant/business-hours";
 import { getRestaurantBySlug, getRestaurantSnapshot } from "@/server/restaurant/queries";
 
 export const dynamic = "force-dynamic";
@@ -32,7 +33,13 @@ export default async function PublicMenuPage({
     <PublicMenuView
       restaurant={snapshot.restaurant}
       settings={snapshot.settings}
-      hours={snapshot.hours}
+      openState={evaluateOpenState({
+        hours: snapshot.hours,
+        now: new Date(),
+        timeZone: snapshot.restaurant.timezone,
+        manuallyClosed: snapshot.settings.isManuallyClosed,
+        deliveryEnabled: snapshot.settings.deliveryEnabled,
+      })}
       menu={menu}
     />
   );

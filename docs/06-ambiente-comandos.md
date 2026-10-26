@@ -90,15 +90,18 @@ por processo.
 `npm test` roda sem banco externo:
 
 - **Unitários**: horário de funcionamento (fuso, múltiplos períodos, virada de
-  meia-noite, entrega), dinheiro, schemas de configurações e cardápio,
-  integridade dos dados importados do protótipo.
+  meia-noite, entrega), dinheiro, schemas de configurações, cardápio, checkout e
+  pedido, máquina de estados, carrinho e integridade dos dados importados do
+  protótipo.
 - **Integração**: Postgres real em WASM (PGlite) com as mesmas migrações;
   valida SQL, constraints, autorização de configurações, CRUD do cardápio,
-  isolamento entre restaurantes e filtros do cardápio público.
+  isolamento entre restaurantes, filtros do cardápio público, criação de pedido
+  (preço, snapshot, numeração, idempotência, rate limit), transições de status,
+  cancelamento e consultas do painel.
 
 Os testes de unidade/integração **não** cobrem login real no Supabase, RLS nem o
-navegador. Login, configurações e o fluxo do cardápio são cobertos pelo E2E
-abaixo.
+navegador. Login, configurações, cardápio e o fluxo de pedido são cobertos pelo
+E2E abaixo.
 
 ## E2E (Playwright)
 
@@ -109,15 +112,21 @@ npm run build
 E2E_EMAIL="voce@restaurante.com" E2E_PASSWORD="sua-senha" npm run test:e2e
 ```
 
-- `playwright.config.ts` sobe `next start` na porta 3100 e reutiliza um servidor
-  já aberto.
+- `playwright.config.ts` carrega `.env.local`, sobe `next start` na porta 3100 e
+  reutiliza um servidor já aberto.
 - Sem `E2E_EMAIL`/`E2E_PASSWORD` os testes autenticados são pulados (o CI não
-  tem segredo).
+  tem segredo). O teste da Fase 3 também precisa de `DATABASE_URL` para preparar
+  e limpar o banco.
 - O teste da Fase 1 altera a taxa de entrega, recarrega para provar a
   persistência e restaura o valor original.
 - O teste da Fase 2 cria categoria, produto e adicional, confere no cardápio
   público, tenta excluir a categoria com produto (bloqueado), remove tudo e
   limpa os dados mesmo se falhar.
+- O teste da Fase 3 força o restaurante aberto com entrega liberada, cria um
+  pedido real pelo cardápio, aceita e cancela no painel, confere o link público
+  e apaga o pedido ao final. Horários e configurações são restaurados.
+  **Não rode contra produção com clientes usando o sistema**: o teste abre a
+  loja temporariamente. A numeração global avança e não é decrementada.
 - Instalação do navegador: `npx playwright install chromium`.
 
 ## Latência e região

@@ -58,7 +58,6 @@ export default async function PanelLayout({ children }: { children: React.ReactN
               {snapshot ? `Fuso ${snapshot.restaurant.timezone}` : "Configuração incompleta"}
             </span>
           </div>
-          <p className="text-xs text-ink-soft">Atualizações automáticas entram na Fase 3</p>
         </header>
 
         <main className="flex-1 px-5 py-6">{children}</main>

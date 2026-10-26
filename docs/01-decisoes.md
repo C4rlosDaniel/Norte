@@ -64,8 +64,11 @@ escolhida e troco quando em dinheiro.
 
 ## D11 — Antiabuso
 
-Turnstile no checkout (Fase 3), rate limit em banco, validação Zod em toda
-entrada e limites de quantidade/observação.
+Rate limit em banco no checkout (10 pedidos por IP a cada 10 minutos e 10 por
+telefone a cada hora, com hash do telefone), validação Zod em toda entrada e
+limites de quantidade/observação. Turnstile/CAPTCHA não foi implementado na
+Fase 3: o fluxo é link-first, já tem limite no servidor e o CAPTCHA adicionaria
+atrito e dependência externa. Reavaliar na Fase 6 com evidência de abuso.
 
 ## D12 — Hospedagem
 
@@ -85,3 +88,17 @@ de novo no checkout.
 A coluna `products.image_url` existe, mas upload e exibição ficam adiados até
 haver fotos reais e uma decisão de storage. Não implementar uma tela de upload
 sem conteúdo nem renderizar imagem quebrada.
+
+## D15 — Link público do pedido
+
+O cliente acompanha o pedido em `/pedido/[code]` sem login. O código é aleatório
+(8 bytes, 16 hex, 64 bits) e não expõe o id interno. O número do pedido é global
+por restaurante, formatado como `#0123`, e nunca é reaproveitado.
+
+## D16 — Máquina de estados do pedido
+
+Fluxo de entrega: `pending → confirmed → preparing → ready →
+out_for_delivery → delivered`. Retirada vai de `ready` direto para `delivered`.
+`canceled` é terminal e permitido enquanto o pedido está ativo. Toda mudança
+grava `order_events`; cancelar também encerra impressão pendente e marca a
+tarefa de WhatsApp não enviada como `skipped`.

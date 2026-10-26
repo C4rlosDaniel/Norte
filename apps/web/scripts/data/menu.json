@@ -32,11 +32,6 @@
       "sortOrder": 6
     },
     {
-      "key": "adicionais",
-      "name": "Adicionais",
-      "sortOrder": 7
-    },
-    {
       "key": "porcoes",
       "name": "Porções Quentes",
       "sortOrder": 8
@@ -457,6 +452,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -521,6 +531,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -585,6 +610,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -649,6 +689,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -713,6 +768,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -778,6 +848,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -843,6 +928,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -907,6 +1007,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -971,6 +1086,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -1035,6 +1165,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -1100,6 +1245,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -1164,6 +1324,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -1244,6 +1419,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -1308,6 +1498,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -1372,6 +1577,21 @@
             {
               "name": "Mandioca frita",
               "priceCents": 1000
+            },
+            {
+              "name": "2 ovos",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Salada P",
+              "priceCents": 500,
+              "isAvailable": true
+            },
+            {
+              "name": "Queijo Coalho (tira)",
+              "priceCents": 1000,
+              "isAvailable": true
             }
           ]
         },
@@ -1501,141 +1721,6 @@
       "isAvailable": true,
       "isFeatured": false,
       "sortOrder": 6,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-mini-fritas",
-      "categoryKey": "adicionais",
-      "name": "Mini Fritas",
-      "description": "Para completar o seu prato.",
-      "priceCents": 1000,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 0,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-torresminho",
-      "categoryKey": "adicionais",
-      "name": "Torresminho",
-      "description": "Para completar o seu prato.",
-      "priceCents": 1500,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 1,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-1-ovo",
-      "categoryKey": "adicionais",
-      "name": "1 Ovo",
-      "description": "Para completar o seu prato.",
-      "priceCents": 300,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 2,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-2-ovos",
-      "categoryKey": "adicionais",
-      "name": "2 Ovos",
-      "description": "Para completar o seu prato.",
-      "priceCents": 500,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 3,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-salada-p",
-      "categoryKey": "adicionais",
-      "name": "Salada P",
-      "description": "Para completar o seu prato.",
-      "priceCents": 500,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 4,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-mandioca-frita",
-      "categoryKey": "adicionais",
-      "name": "Mandioca Frita",
-      "description": "Para completar o seu prato.",
-      "priceCents": 1000,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 5,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-farofa",
-      "categoryKey": "adicionais",
-      "name": "Farofa",
-      "description": "Para completar o seu prato.",
-      "priceCents": 500,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 6,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-vinagrete",
-      "categoryKey": "adicionais",
-      "name": "Vinagrete",
-      "description": "Para completar o seu prato.",
-      "priceCents": 1000,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 7,
-      "modifierGroups": []
-    },
-    {
-      "key": "adicionais-queijo-coalho-tira",
-      "categoryKey": "adicionais",
-      "name": "Queijo Coalho (tira)",
-      "description": "Para completar o seu prato.",
-      "priceCents": 1000,
-      "imageUrl": null,
-      "servesLabel": "",
-      "badge": "",
-      "tags": [],
-      "isAvailable": true,
-      "isFeatured": false,
-      "sortOrder": 8,
       "modifierGroups": []
     },
     {

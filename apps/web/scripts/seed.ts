@@ -54,26 +54,14 @@ async function main() {
     })
     .onConflictDoNothing();
 
-  const hours: Array<typeof businessHours.$inferInsert> = Array.from(
-    { length: 6 },
-    (_, index) => index + 1,
-  ).map((weekday) => ({
+  const hours: Array<typeof businessHours.$inferInsert> = Array.from({ length: 7 }, (_, weekday) => ({
     restaurantId: restaurant.id,
     weekday,
-    opensAt: "11:00:00",
-    closesAt: "22:00:00",
-    acceptsDeliveryUntil: "20:30:00",
+    opensAt: "09:00:00",
+    closesAt: "18:00:00",
+    acceptsDeliveryUntil: "18:00:00",
     isClosed: false,
   }));
-
-  hours.push({
-    restaurantId: restaurant.id,
-    weekday: 0,
-    opensAt: "11:00:00",
-    closesAt: "22:00:00",
-    acceptsDeliveryUntil: null,
-    isClosed: true,
-  });
 
   await db.insert(businessHours).values(hours).onConflictDoNothing();
 

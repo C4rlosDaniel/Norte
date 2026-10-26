@@ -123,7 +123,8 @@ test.describe("cardápio no painel e no site", () => {
       await expect(publicProduct).toBeVisible();
       await expect(publicProduct.getByText("R$ 12,34")).toBeVisible();
 
-      await publicProduct.getByText("Adicionais", { exact: true }).click();
+      await publicProduct.getByText("Ver opções", { exact: true }).click();
+      await expect(publicProduct.getByText(groupName, { exact: true })).toBeVisible();
       await expect(publicProduct.getByText(new RegExp(optionName))).toBeVisible();
 
       // Categoria com produto não pode ser apagada

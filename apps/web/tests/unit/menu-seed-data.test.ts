@@ -25,9 +25,25 @@ const data = JSON.parse(
 ) as SeedData;
 
 describe("dados do cardápio importados do protótipo", () => {
-  it("tem as 17 categorias e 117 produtos do protótipo", () => {
-    expect(data.categories).toHaveLength(17);
-    expect(data.products).toHaveLength(117);
+  it("tem 16 categorias e 108 produtos após mover 'Adicionais' para grupos", () => {
+    expect(data.categories).toHaveLength(16);
+    expect(data.products).toHaveLength(108);
+  });
+
+  it("não tem categoria 'Adicionais': os extras são grupos de modificadores", () => {
+    expect(data.categories.some((category) => category.key === "adicionais")).toBe(false);
+
+    const extrasGroups = data.products.flatMap((product) =>
+      product.modifierGroups.filter((group) => group.name === "Adicionais"),
+    );
+    expect(extrasGroups.length).toBeGreaterThan(0);
+    for (const group of extrasGroups) {
+      expect(group.minSelections).toBe(0);
+      expect(group.maxSelections).toBeGreaterThanOrEqual(3);
+      expect(group.options.map((option) => option.name)).toEqual(
+        expect.arrayContaining(["2 ovos", "Salada P", "Queijo Coalho (tira)"]),
+      );
+    }
   });
 
   it("não repete chaves nem nomes na mesma categoria", () => {

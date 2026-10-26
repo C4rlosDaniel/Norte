@@ -1,7 +1,7 @@
 # WhatsApp (Cloud API oficial)
 
-Nada implementado ainda (Fase 5). Este documento fecha a estratégia e os
-riscos.
+A fila `whatsapp_tasks` já nasce junto do pedido (Fase 3), mas **nada é
+enviado** ainda. Este documento fecha a estratégia e os riscos da Fase 5.
 
 ## Por que Cloud API e não automação de WhatsApp Web
 

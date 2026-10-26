@@ -1,8 +1,27 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
 import { StatusBadge, closedReasonLabel } from "@/components/status-badge";
-import type { BusinessHour, Restaurant, RestaurantSettings } from "@/server/db/schema";
+import type { Restaurant, RestaurantSettings } from "@/server/db/schema";
 import { formatBRL } from "@/server/money";
-import { evaluateOpenState } from "@/server/restaurant/business-hours";
+import type { OpenState } from "@/server/restaurant/business-hours";
 import type { MenuProduct, PublicMenu } from "@/server/menu/queries";
+
+import {
+  CART_MAX_QUANTITY,
+  cartItemCount,
+  cartKey,
+  cartSubtotal,
+  clearStoredCart,
+  loadStoredCart,
+  mergeCartLine,
+  resolveCart,
+  saveStoredCart,
+  type StoredCartLine,
+} from "./menu/cart";
+import { CartDrawer } from "./menu/cart-drawer";
+import { ProductDialog } from "./menu/product-dialog";
 
 function ModifierSummary({ product }: { product: MenuProduct }) {
   if (product.modifierGroups.length === 0) return null;
@@ -10,7 +29,7 @@ function ModifierSummary({ product }: { product: MenuProduct }) {
   return (
     <details className="mt-2">
       <summary className="cursor-pointer text-xs font-semibold underline underline-offset-2">
-        Adicionais
+        Ver opções
       </summary>
       <ul className="mt-2 space-y-1 text-xs text-ink-soft">
         {product.modifierGroups.map((group) => (
@@ -31,7 +50,20 @@ function ModifierSummary({ product }: { product: MenuProduct }) {
   );
 }
 
-function ProductCard({ product }: { product: MenuProduct }) {
+function ProductCard({
+  product,
+  orderingDisabled,
+  onAdd,
+  onChoose,
+}: {
+  product: MenuProduct;
+  orderingDisabled: boolean;
+  onAdd: () => void;
+  onChoose: () => void;
+}) {
+  const hasOptions = product.modifierGroups.length > 0;
+  const canOrder = product.isAvailable && !orderingDisabled;
+
   return (
     <article
       id={`produto-${product.id}`}
@@ -59,6 +91,24 @@ function ProductCard({ product }: { product: MenuProduct }) {
 
         <p className="whitespace-nowrap font-semibold">{formatBRL(product.priceCents)}</p>
       </div>
+
+      <div className="mt-3 flex justify-end">
+        <button
+          type="button"
+          className="btn btn-secondary px-3 py-1.5 text-xs"
+          disabled={!canOrder}
+          onClick={hasOptions ? onChoose : onAdd}
+          aria-label={`${hasOptions ? "Escolher" : "Adicionar"} ${product.name}`}
+        >
+          {!product.isAvailable
+            ? "Indisponível"
+            : orderingDisabled
+              ? "Fechado"
+              : hasOptions
+                ? "Escolher"
+                : "Adicionar"}
+        </button>
+      </div>
     </article>
   );
 }
@@ -66,38 +116,104 @@ function ProductCard({ product }: { product: MenuProduct }) {
 export function PublicMenuView({
   restaurant,
   settings,
-  hours,
+  openState,
   menu,
 }: {
   restaurant: Restaurant;
   settings: RestaurantSettings;
-  hours: BusinessHour[];
+  openState: OpenState;
   menu: PublicMenu;
 }) {
-  const state = evaluateOpenState({
-    hours,
-    now: new Date(),
-    timeZone: restaurant.timezone,
-    manuallyClosed: settings.isManuallyClosed,
-    deliveryEnabled: settings.deliveryEnabled,
-  });
+  const [lines, setLines] = useState<StoredCartLine[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [editing, setEditing] = useState<MenuProduct | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const statusText = state.isOpen
-    ? state.deliveryAllowed
-      ? "Entrega disponível neste horário"
-      : "Somente retirada neste horário"
-    : closedReasonLabel(state);
+  const catalog = useMemo(
+    () =>
+      new Map(
+        menu.categories
+          .flatMap((category) => category.products)
+          .map((product) => [product.id, product]),
+      ),
+    [menu],
+  );
+  const resolved = useMemo(() => resolveCart(catalog, lines), [catalog, lines]);
 
+  const orderingDisabled = !openState.isOpen;
+  const count = cartItemCount(lines);
+  const subtotal = cartSubtotal(resolved);
   const phoneDigits = settings.phone.replace(/\D/g, "");
 
+  useEffect(() => {
+    // Lê o carrinho salvo depois da hidratação, sem divergir do HTML inicial.
+    const timer = window.setTimeout(() => {
+      setLines(loadStoredCart(restaurant.slug));
+      setHydrated(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [restaurant.slug]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    saveStoredCart(restaurant.slug, lines);
+  }, [hydrated, lines, restaurant.slug]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 3000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  function addLine(line: StoredCartLine) {
+    setLines((previous) => mergeCartLine(previous, line));
+    setEditing(null);
+    setToast("Adicionado ao carrinho.");
+  }
+
+  function changeQuantity(key: string, quantity: number) {
+    const target = resolved.find((item) => item.key === key);
+    if (!target) return;
+
+    const nextQuantity = Math.min(Math.max(quantity, 1), CART_MAX_QUANTITY);
+
+    setLines((previous) =>
+      previous.map((line) =>
+        line === target.line ? { ...line, quantity: nextQuantity } : line,
+      ),
+    );
+  }
+
+  function removeLine(key: string) {
+    setLines((previous) =>
+      previous.filter(
+        (line) => cartKey(line.productId, line.optionIds, line.notes) !== key,
+      ),
+    );
+  }
+
+  function clearCart() {
+    if (!window.confirm("Limpar todo o carrinho?")) return;
+    setLines([]);
+    clearStoredCart(restaurant.slug);
+  }
+
+  const statusText = openState.isOpen
+    ? openState.deliveryAllowed
+      ? "Entrega disponível neste horário"
+      : "Somente retirada neste horário"
+    : closedReasonLabel(openState);
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-3xl px-4 py-8 pb-28 sm:px-6">
       <header className="space-y-4">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-terracotta">Cardápio</p>
         <h1 className="font-display text-4xl leading-tight">{restaurant.name}</h1>
 
         <div className="flex flex-wrap items-center gap-3">
-          <StatusBadge state={state} />
+          <StatusBadge state={openState} />
           <span className="text-sm text-ink-soft">{statusText}</span>
         </div>
 
@@ -199,7 +315,20 @@ export function PublicMenuView({
 
                 <div className="space-y-2">
                   {category.products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      orderingDisabled={orderingDisabled}
+                      onAdd={() =>
+                        addLine({
+                          productId: product.id,
+                          quantity: 1,
+                          optionIds: [],
+                          notes: "",
+                        })
+                      }
+                      onChoose={() => setEditing(product)}
+                    />
                   ))}
                 </div>
               </section>
@@ -211,6 +340,53 @@ export function PublicMenuView({
       <footer className="mt-10 border-t border-leather/15 pt-4 text-xs text-ink-soft">
         {restaurant.name} · cardápio atualizado pela equipe do restaurante.
       </footer>
+
+      {toast ? (
+        <p
+          role="status"
+          className="fixed inset-x-4 bottom-24 z-30 mx-auto max-w-sm rounded-xl bg-leather px-4 py-2 text-center text-sm font-semibold text-paper shadow-lg"
+        >
+          {toast}
+        </p>
+      ) : null}
+
+      {hydrated && lines.length > 0 ? (
+        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-leather/20 bg-paper/95 p-3 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+            <div className="min-w-0 text-sm">
+              <p className="font-semibold">
+                {count} {count === 1 ? "item" : "itens"} · {formatBRL(subtotal)}
+              </p>
+              <p className="truncate text-xs text-ink-soft">Taxa de entrega no checkout</p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary whitespace-nowrap"
+              onClick={() => setCartOpen(true)}
+            >
+              Ver carrinho
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <CartDrawer
+        slug={restaurant.slug}
+        open={cartOpen}
+        lines={lines}
+        resolved={resolved}
+        onClose={() => setCartOpen(false)}
+        onChangeQuantity={changeQuantity}
+        onRemove={removeLine}
+        onClear={clearCart}
+      />
+
+      <ProductDialog
+        product={editing}
+        orderingDisabled={orderingDisabled}
+        onClose={() => setEditing(null)}
+        onAdd={addLine}
+      />
     </div>
   );
 }

@@ -37,14 +37,24 @@ Critério de aceite cumprido: `lint`, `typecheck`, `test` e `build` verdes;
 migração e seed aplicados no Supabase real; E2E cobrindo categoria, produto,
 adicional, site público e exclusão com limpeza.
 
-## Fase 3 — Pedido (próxima)
+## Fase 3 — Pedido (concluída)
 
-Carrinho, checkout (entrega/retirada, pagamento, troco), recálculo integral no
-servidor, snapshot do pedido, número sequencial legível, criação transacional
-de pedido + trabalho de impressão + tarefa de WhatsApp, painel de pedidos com
-mudança de status, proteção contra pedido duplicado e rate limit.
+Carrinho no navegador, checkout de entrega/retirada com pagamento e troco,
+recálculo integral no servidor, snapshot de itens/adicionais, número sequencial
+por restaurante, criação transacional de pedido + trabalho de impressão +
+tarefa de WhatsApp, página pública de acompanhamento e painel de pedidos com
+filtros, histórico e mudança de status. Proteção contra duplicidade por chave de
+idempotência e rate limit por IP e telefone.
 
-## Fase 4 — Impressão
+Critério de aceite cumprido: `lint`, `typecheck`, `test` e `build` verdes;
+migração `0002` aplicada no Supabase real; testes de integração cobrindo preço,
+snapshot, numeração, idempotência, rate limit e transições; E2E cobrindo
+cardápio → checkout → página pública → aceite/cancelamento no painel.
+
+Impressão e envio de WhatsApp ainda não acontecem: os trabalhos ficam na fila
+para as Fases 4 e 5.
+
+## Fase 4 — Impressão (próxima)
 
 Agente Windows em Node/TS, autenticação por API key com hash, endpoint de poll
 autenticado, lease com expiração, `PrinterDriver` (ESC/POS e simulado),
