@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kraft: oklch(0.925 0.04 82);
+  --color-kraft-dark: oklch(0.87 0.06 82);
+  --color-paper: oklch(0.96 0.025 85);
+  --color-leather: oklch(0.32 0.06 50);
+  --color-terracotta: oklch(0.55 0.14 40);
+  --color-sun: oklch(0.76 0.15 75);
+  --color-cactus: oklch(0.48 0.08 130);
+  --color-ink-soft: oklch(0.45 0.05 55);
+  --font-display: ui-serif, Georgia, "Times New Roman", serif;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--color-kraft);
+    color: var(--color-leather);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-terracotta);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    border-radius: 1rem;
+    border: 1px solid color-mix(in oklab, var(--color-leather) 16%, transparent);
+    background-color: var(--color-paper);
+    box-shadow: 0 1px 0 color-mix(in oklab, var(--color-leather) 10%, transparent);
+  }
+
+  .label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.375rem;
+  }
+
+  .input {
+    width: 100%;
+    border-radius: 0.625rem;
+    border: 1px solid color-mix(in oklab, var(--color-leather) 25%, transparent);
+    background-color: white;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.95rem;
+    color: var(--color-leather);
+  }
+
+  .input:disabled {
+    opacity: 0.6;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.625rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 120ms ease, opacity 120ms ease;
+  }
+
+  .btn-primary {
+    background-color: var(--color-cactus);
+    color: var(--color-paper);
+  }
+
+  .btn-primary:hover {
+    background-color: color-mix(in oklab, var(--color-cactus) 88%, black);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background-color: white;
+    color: var(--color-leather);
+    border: 1px solid color-mix(in oklab, var(--color-leather) 25%, transparent);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-kraft);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 9999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .badge-open {
+    background-color: color-mix(in oklab, var(--color-cactus) 16%, transparent);
+    color: color-mix(in oklab, var(--color-cactus) 85%, black);
+  }
+
+  .badge-closed {
+    background-color: color-mix(in oklab, var(--color-terracotta) 16%, transparent);
+    color: color-mix(in oklab, var(--color-terracotta) 85%, black);
+  }
+}
