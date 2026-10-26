@@ -62,6 +62,21 @@ A integração usa PGlite (Postgres compilado para WASM) e aplica as migrações
 reais, validando SQL, `CHECK`, `UNIQUE`, `ON DELETE CASCADE` e o caso de uso de
 configurações.
 
+## Smoke test de runtime
+
+Build de produção servido localmente (`next start`, porta 3123) com credenciais
+falsas para testar o comportamento sem Supabase:
+
+| Requisição | Resultado real |
+| --- | --- |
+| `GET /login` | 200 com o formulário de login renderizado |
+| `GET /painel` | 307 para `/login?next=%2Fpainel` (guarda do proxy funcionando) |
+| `GET /` com banco fora do ar | shell com `loading.tsx` e, no streaming, o boundary de erro assume a tela |
+
+Observação: como a página usa streaming com `loading.tsx`, o status HTTP é 200 e
+o erro é renderizado pelo boundary no cliente — comportamento esperado do Next,
+não um 500. O log do servidor mostra a causa real (`ECONNREFUSED`).
+
 ## Não verificado (honestidade acima de otimismo)
 
 - **Login real**: depende de um projeto Supabase com usuário criado. Não foi
