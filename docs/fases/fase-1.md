@@ -77,25 +77,44 @@ Observação: como a página usa streaming com `loading.tsx`, o status HTTP é 2
 o erro é renderizado pelo boundary no cliente — comportamento esperado do Next,
 não um 500. O log do servidor mostra a causa real (`ECONNREFUSED`).
 
-## Não verificado (honestidade acima de otimismo)
+## Verificação no Supabase real
 
-- **Login real**: depende de um projeto Supabase com usuário criado. Não foi
-  executado porque as credenciais ainda não existem.
-- **Migração contra o Supabase real**: validada apenas em PGlite.
-- **Renderização com dados vindos do banco em runtime**: o build compila as
-  rotas, mas a página pública com dados reais depende do Supabase.
+Projeto `apompopfrmgqnfhaenxl` (região us-west-2), executada em 26/10/2026:
+
+| Etapa | Resultado |
+| --- | --- |
+| `npm run db:migrate` (pooler modo sessão, 5432) | migração aplicada; `drizzle.__drizzle_migrations` = 1 |
+| `npm run db:seed` | restaurante `8ef53e05-712b-4d00-9005-6dc65b4e1810`, 7 horários, configurações criadas |
+| `npm run create:admin` (modo somente vínculo, sem service role) | acesso de `ifodde440@gmail.com` vinculado como `owner` |
+| `GET /` no build de produção | 200 com dados reais do banco (nome, endereço, status por fuso) |
+| `GET /painel` sem sessão | 307 → `/login?next=%2Fpainel` |
+| `npm run test:e2e` | **2/2 passando**: guarda de rota, login real, painel, alteração da taxa, mensagem de sucesso, recarga com valor persistido, restauração e logout |
+| Estado final no banco | taxa de volta a 500 centavos, `updated_at` = 14:26:53Z (prova da escrita real) |
+
+Latência medida desta máquina até o projeto: conexão ao pooler de 1,2 s a
+5,8 s e consultas seguintes em ~250 ms. É a distância até Oregon. Para produção,
+recomendo criar o projeto em **sa-east-1 (São Paulo)** — o fluxo de pedidos faz
+várias consultas por requisição.
+
+## Não verificado
+
 - **RLS**: o app acessa o banco pelo servidor; RLS não é usado como barreira.
   Confirmar que o banco não está exposto ao browser.
-- **Fluxo autenticado ponta a ponta** (login → painel → salvar → recarregar).
+- **Deploy real** (domínio, TLS, variáveis no provedor).
+- **Turnstile e rate limit** (Fases 3 e 6).
+- **Cadastro público no Supabase Auth**: ainda está habilitado no projeto (foi
+  usado para criar o usuário). Desligar em Authentication → Sign In / Up, já que
+  o app não tem cadastro.
 
 ## Pendências e bloqueios
 
-1. Criar o projeto Supabase e preencher `apps/web/.env.local`.
-2. Rodar `db:migrate`, `db:seed`, `create:admin` e verificar login de verdade.
-3. Definir dados reais do restaurante (nome, endereço, telefone, taxa,
+1. Desligar o cadastro público no Supabase Auth (o app não tem essa tela).
+2. Definir dados reais do restaurante (nome, endereço, telefone, taxa,
    horários) e substituir os valores de demonstração do seed.
-4. Confirmar identidade visual definitiva (o protótipo usa "Amigos do Norte";
+3. Confirmar identidade visual definitiva (o protótipo usa "Amigos do Norte";
    o repositório se chama Norte). Afeta nome, logo e metadados.
+4. Decidir a região do projeto de produção: **sa-east-1** reduz muito a latência
+   em relação ao projeto atual (us-west-2).
 5. WhatsApp: decidir número e caminho de onboarding (BSP/coexistência) — maior
    risco do projeto.
 6. Impressora: modelo, conexão e largura de papel (Fase 4).

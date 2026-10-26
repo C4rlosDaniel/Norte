@@ -10,7 +10,9 @@
 1. Criar projeto em https://supabase.com.
 2. Em **Project Settings → Database**, copiar:
    - Connection string **Transaction pooler** (porta 6543) → `DATABASE_URL`
-   - Connection string **Direct connection** (porta 5432) → `DIRECT_URL`
+   - Connection string **Session pooler** (porta 5432) → `DIRECT_URL`.
+     Em projetos novos a conexão "Direct" é só IPv6; se sua rede não tiver
+     IPv6, use o session pooler para migrações. Nunca use a 6543 para DDL.
 3. Em **Project Settings → API**, copiar:
    - Project URL → `SUPABASE_URL`
    - `anon public` key → `SUPABASE_ANON_KEY`
@@ -53,6 +55,7 @@ npm run lint         # ESLint (sem regras desligadas)
 npm run typecheck    # tsc --noEmit
 npm test             # Vitest (unitários + integração PGlite)
 npm run test:watch   # Vitest em watch
+npm run test:e2e     # Playwright (login e configurações, exige Supabase real)
 
 npm run db:generate  # gerar migração a partir do schema
 npm run db:migrate   # aplicar migrações (usa DIRECT_URL)
@@ -88,8 +91,40 @@ por processo.
 - **Integração**: Postgres real em WASM (PGlite) com as mesmas migrações;
   valida SQL, constraints, autorização e gravação de configurações.
 
-O que os testes **não** cobrem: login real no Supabase e RLS. Isso exige um
-projeto Supabase e está no roteiro de verificação da fase.
+Os testes de unidade/integração **não** cobrem login real no Supabase, RLS nem o
+navegador. O login e a gravação de configurações são cobertos pelo E2E abaixo.
+
+## E2E (Playwright)
+
+Somente fluxos críticos, contra build de produção e Supabase real:
+
+```bash
+npm run build
+E2E_EMAIL="voce@restaurante.com" E2E_PASSWORD="sua-senha" npm run test:e2e
+```
+
+- `playwright.config.ts` sobe `next start` na porta 3100 e reutiliza um servidor
+  já aberto.
+- Sem `E2E_EMAIL`/`E2E_PASSWORD` os testes autenticados são pulados (o CI não
+  tem segredo).
+- O teste altera a taxa de entrega, recarrega para provar a persistência e
+  restaura o valor original.
+- Instalação do navegador: `npx playwright install chromium`.
+
+## Latência e região
+
+Projetos Supabase fora do Brasil adicionam ~250 ms por consulta e até alguns
+segundos para abrir conexão. O painel faz várias consultas por requisição.
+Para produção, criar o projeto em **sa-east-1 (São Paulo)**.
+
+## Acesso do painel
+
+Não existe cadastro público. Crie o usuário em `Authentication → Users → Add
+user` (marque Auto Confirm) e rode `npm run create:admin` com `ADMIN_EMAIL`.
+O script só vincula o usuário ao restaurante; não precisa de service role.
+
+**Desligue "Allow new users to sign up"** em `Authentication → Sign In / Up`
+para que ninguém crie conta pela API pública.
 
 ## Primeiro acesso
 

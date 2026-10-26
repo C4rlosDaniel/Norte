@@ -12,8 +12,8 @@ Este repositório é a reescrita séria do protótipo que ficou no projeto
 | Fase | Escopo | Situação |
 | --- | --- | --- |
 | 0 | Auditoria e arquitetura | concluída |
-| 1 | Fundação: Next.js, banco, migrações, autenticação, painel, horários e configurações | em implementação |
-| 2 | Cardápio (público e painel) | não iniciada |
+| 1 | Fundação: Next.js, banco, migrações, autenticação, painel, horários e configurações | concluída e verificada no Supabase real |
+| 2 | Cardápio (público e painel) | próxima |
 | 3 | Carrinho, checkout, pedidos e impressão | não iniciada |
 | 4 | Agente de impressão Windows | não iniciada |
 | 5 | WhatsApp Cloud API | não iniciada |
@@ -46,6 +46,7 @@ npm run dev
 - Cardápio público: http://localhost:3000
 - Painel: http://localhost:3000/painel (sem cadastro público; o acesso é criado pelo script)
 - Verificações: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
+- E2E (com Supabase real): `E2E_EMAIL=... E2E_PASSWORD=... npm run test:e2e`
 
 Detalhes de ambiente, comandos e configuração do Supabase em
 [`docs/06-ambiente-comandos.md`](docs/06-ambiente-comandos.md).
